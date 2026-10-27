@@ -527,7 +527,10 @@ document.addEventListener('change',e=>{const el=e.target;if(el.id==='ph'){const 
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet')closeSheet()});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='nm'){e.preventDefault();$('[data-savename]').click()}});
 
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&S.code&&Date.now()-(S.schedAt||0)>5*60000)loadSched()});
+const BUILD='1793135148';
+async function checkVer(){if(!/github\.io$/.test(location.hostname)||BUILD.indexOf('__')===0)return;try{const r=await fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)return;const m=(await r.text()).match(/const BUILD='(\d+)'/);if(m&&m[1]!==BUILD&&!(tab==='intake'&&draft())){persist();location.reload()}}catch(e){}}
+setTimeout(checkVer,1500);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState!=='visible')return;checkVer();if(S.code&&Date.now()-(S.schedAt||0)>5*60000)loadSched()});
 idbOpen().then(()=>{pruneSent();persist();setTab('home');if(S.code)loadSched();if(!S.name)askName()});
 })();
 </script>
