@@ -1,0 +1,189 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#F4F5F1">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Timberline Office"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png"><link rel="icon" href="../icon-192.png"><link rel="manifest" href="manifest.json">
+<title>Timberline Owner View</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{--bg:#F4F5F1;--surface:#fff;--sunk:#EFF1EC;--line:#E8EBE4;--line2:#DCE1D6;--ink:#101410;--ink2:#2F372E;--muted:#667064;--faint:#9AA397;--accent:#2F6B1F;--accent2:#5C9A2E;--soft:#EEF6E7;--softline:#CFE3BE;--char:#1F2125;--bad:#B42318;--badsoft:#FCE8E6;--warn:#995A00;--warnsoft:#FBEFD9;--info:#1F5A8A;--infosoft:#E6F0F8;
+--font:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--display:"Plus Jakarta Sans","Inter",system-ui,sans-serif;--sh:0 1px 2px rgba(16,24,12,.04),0 8px 24px -8px rgba(16,24,12,.10)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{background:var(--bg)}
+body{margin:0;color:var(--ink);font:15px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer}
+.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top,0px))}
+.top .in{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:12px;min-height:44px}
+.top img{height:40px;width:auto;border-radius:8px}
+.top .t{font:800 17px var(--display);letter-spacing:-.02em;line-height:1.1}.top .t small{display:block;font:600 11px var(--font);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.top .sp{flex:1}.top .upd{font-size:12.5px;color:var(--muted);text-align:right}
+.wrap{max-width:1120px;margin:0 auto;padding:18px 16px calc(110px + env(safe-area-inset-bottom,0px))}
+h1{font:800 28px/1.1 var(--display);letter-spacing:-.035em;margin:0}h2{font:700 17px var(--display);letter-spacing:-.02em;margin:0}
+.sub{color:var(--muted);margin:6px 0 0}
+.card{background:var(--surface);border-radius:20px;box-shadow:var(--sh);margin-top:16px;overflow:hidden}
+.card>.h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 18px;border-bottom:1px solid var(--line)}
+.pad{padding:16px 18px}.empty{padding:20px 18px;color:var(--muted);font-size:14.5px}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+@media(min-width:760px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tile{background:#fff;border-radius:18px;box-shadow:var(--sh);padding:15px 16px;display:grid;gap:3px;min-width:0}
+.tile .lab{font-size:12.5px;color:var(--muted);font-weight:600}.tile .val{font:800 26px var(--display);letter-spacing:-.03em}.tile .note{font-size:12.5px;color:var(--muted)}
+.tile .note.bad{color:var(--bad);font-weight:650}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:13px 18px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}.row .tt{font-weight:650}.row .mm{font-size:13px;color:var(--muted)}.row .r{text-align:right;white-space:nowrap}
+.row .amt{font-weight:700;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-size:12px;font-weight:650;padding:3px 9px;border-radius:8px;background:var(--sunk);color:var(--ink2);white-space:nowrap}
+.pill.g{background:var(--soft);color:var(--accent)}.pill.w{background:var(--warnsoft);color:var(--warn)}.pill.r{background:var(--badsoft);color:var(--bad)}.pill.i{background:var(--infosoft);color:var(--info)}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:1px}
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:14px -16px 0;padding:0 16px 2px}.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;border:1px solid var(--line2);background:#fff;border-radius:999px;padding:8px 13px;font-size:13.5px;font-weight:600;color:var(--ink2)}
+.seg button i{font-style:normal;color:var(--muted);margin-left:3px}.seg button[aria-pressed="true"]{background:var(--char);border-color:var(--char);color:#fff}.seg button[aria-pressed="true"] i{color:#C9CEC4}
+.dayh{font:600 12px var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--accent);padding:14px 18px 2px}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#5C9A2E,#2F6B1F)}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:10px 14px;border-top:1px solid var(--line);text-align:left;white-space:nowrap}th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:650;border-top:0}td.r,th.r{text-align:right}.tscroll{overflow-x:auto}
+.cols{display:grid;gap:0 18px}@media(min-width:1000px){.cols{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}.cols>.card{align-self:start}}
+.hero{border-radius:24px;padding:22px 20px;color:#fff;background:radial-gradient(120% 140% at 0% 0%,#2D3B2A 0%,#1A211A 50%,#141914 100%);position:relative;overflow:hidden;box-shadow:0 18px 40px -18px rgba(16,24,12,.55)}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 90% at 90% 0%,rgba(124,184,72,.42),rgba(124,184,72,0) 60%);pointer-events:none}
+.hero>*{position:relative}.hero .eb{font-size:13px;color:rgba(255,255,255,.72)}.hero h1{color:#fff;margin-top:4px}
+.hero .stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.hero .stats span{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:6px 12px;font-size:13px}.hero .stats b{font-family:var(--display);margin-right:4px}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabs .in{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+.tabs button{border:0;background:none;display:grid;justify-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--muted);padding:4px 2px}
+.tabs button svg{width:23px;height:23px}.tabs button[aria-current="true"]{color:var(--accent)}
+.tabs button[aria-current="true"] svg{background:var(--soft);border-radius:10px;padding:3px;box-sizing:content-box;margin:-3px}
+@media(min-width:1000px){html{scroll-padding-top:130px}.tabs{top:65px;bottom:auto;border-top:0;border-bottom:1px solid var(--line);padding:6px 16px}.tabs .in{display:flex;gap:6px}.tabs button{display:flex;gap:8px;align-items:center;font-size:14px;padding:8px 14px;border-radius:12px}.tabs button svg{width:20px;height:20px}.tabs button[aria-current="true"]{background:var(--soft)}.tabs button[aria-current="true"] svg{background:none;padding:0;margin:0}.wrap{padding-top:84px;padding-bottom:60px}}
+.lock{max-width:420px;margin:8vh auto 0;padding:0 16px;text-align:center}
+.lock img{height:72px}.lock h1{margin-top:14px}.lock input{width:100%;height:52px;border:1px solid var(--line2);border-radius:14px;padding:0 14px;font-size:17px;margin-top:18px;background:#fff;text-align:center;letter-spacing:.08em}
+.big{display:flex;align-items:center;justify-content:center;width:100%;height:54px;border:0;border-radius:16px;background:linear-gradient(180deg,#3E8128,#2F6B1F);color:#fff;font:700 16.5px var(--font);margin-top:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;height:36px;border-radius:11px;border:1px solid var(--line2);background:#fff;padding:0 12px;font-weight:600;font-size:14px}
+.err{color:var(--bad);font-weight:600;margin-top:10px;min-height:1.4em}
+[hidden]{display:none!important}
+</style></head><body>
+<div id="lockv" class="lock" hidden>
+ <img src="../apple-touch-icon.png" alt="Timberline Builders">
+ <h1>Owner view</h1><p class="sub">Enter your office code to see the business.</p>
+ <input id="code" placeholder="Office code" autocapitalize="off" autocomplete="off" spellcheck="false">
+ <button class="big" id="open" type="button">Open</button><div class="err" id="err" role="alert"></div>
+</div>
+<div id="appv" hidden>
+<header class="top"><div class="in"><img src="../apple-touch-icon.png" alt="Timberline Builders"><div class="t">Timberline<small>Owner view</small></div><span class="sp"></span><div class="upd" id="upd"></div></div></header>
+<main class="wrap" id="main"></main>
+<nav class="tabs" id="tabs"><div class="in">
+ <button data-tab="home" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+ <button data-tab="pipe" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></svg>Pipeline</button>
+ <button data-tab="cal" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendar</button>
+ <button data-tab="jobs" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg>Jobs</button>
+ <button data-tab="money" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>Money</button>
+ <button data-tab="team" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.3-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.6c1.8.7 3 2.5 3.5 5.4"/></svg>Salesmen</button>
+</div></nav>
+</div>
+<script>
+(()=>{
+const KEY='tl-owner-v1';const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let S={code:'',snap:null,at:0};try{const j=JSON.parse(localStorage.getItem(KEY)||'null');if(j)S={...S,...j}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const b64d=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0));
+async function fileId(code){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('tl-field:'+code));return [...new Uint8Array(h)].slice(0,10).map(b=>b.toString(16).padStart(2,'0')).join('')}
+async function unseal(j,code){const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(code),'PBKDF2',false,['deriveKey']);const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64d(j.salt),iterations:j.it||150000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(j.iv)},key,b64d(j.ct))))}
+async function load(code){const r=await fetch('../sched/'+(await fileId(code))+'.json?t='+Date.now(),{cache:'no-store'});if(r.status===404)throw new Error('nocode');if(!r.ok)throw new Error('net');const j=await r.json();const d=await unseal(j,code);if(!d||d.v!==1||!d.leads)throw new Error('nocode');return d}
+
+/* helpers */
+const n=x=>{const v=+String(x??'').replace(/[^0-9.\-]/g,'');return isFinite(v)?v:0};
+const sum=(a,f)=>a.reduce((t,x)=>t+(typeof f==='function'?n(f(x)):n(x[f])),0);
+const usd=v=>'$'+Math.round(n(v)).toLocaleString();const usdK=v=>{v=n(v);return Math.abs(v)>=1e6?'$'+(v/1e6).toFixed(1)+'M':Math.abs(v)>=1e4?'$'+Math.round(v/1e3)+'k':usd(v)};
+const pct=x=>x==null?'--':Math.round(x*1000)/10+'%';
+const isoD=x=>x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
+const T=()=>isoD(new Date());const addD=(d,k)=>{const x=new Date(d+'T12:00:00');x.setDate(x.getDate()+k);return isoD(x)};
+const dOf=ms=>ms?isoD(new Date(n(ms))):'';
+const fmtD=d=>d?new Date(String(d).length<=10?d+'T12:00:00':d).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';
+const dayName=d=>{const t=T();return d===t?'Today':d===addD(t,1)?'Tomorrow':new Date(d+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'})};
+const between=(a,b)=>Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/864e5);
+const cap=s=>s?s[0].toUpperCase()+s.slice(1):s;
+const repName=id=>id?((S.snap.team||{})[id]||'Salesman'):'Unassigned';
+const COLORS=['#2F6B1F','#1F5A8A','#995A00','#7A3E9D','#0E7C7B','#B42318'];
+const repColor=id=>{if(!id)return '#9AA397';const ids=Object.keys(S.snap.team||{}).sort();const i=ids.indexOf(id);return COLORS[(i<0?0:i)%COLORS.length]};
+function stage(l){if(l.lostAt)return 'Lost';if(l.signedAt||l.jobId)return 'Signed';if(l.acceptedAt)return 'Accepted';if(l.quoteSentAt)return 'Quote sent';if(l.intakeAt)return 'Quoting';if(l.apptDate)return 'Appointment set';if(l.assignedTo||l._rep)return 'Assigned';return 'New'}
+const STG=['New','Assigned','Appointment set','Quoting','Quote sent','Accepted','Signed','Lost'];
+const STGL={'New':'New','Assigned':'Assigned','Appointment set':'Appointment set','Quoting':'Office pricing','Quote sent':'Proposal out','Accepted':'Accepted','Signed':'Signed','Lost':'Lost'};
+const bld=l=>[l.size,cap(String(l.type||'').toLowerCase())].filter(Boolean).join(' ');
+const ACTIVE=['Signed','In progress'],BOOKED=['Signed','In progress','Complete'];
+const CHECK=['estimate','contract','deposit','engineering','permitSub','permitIss','materials','subs','cos','finalInsp','finalInv','lien','warranty'];
+function invPaid(i){return sum(S.snap.payments.filter(p=>p.invoiceId===i.id),'amount')}
+function invState(i){const a=n(i.amount),p=invPaid(i);if(a>0&&p>=a-0.005)return 'Paid';if(!i.issued)return 'Draft';if(i.due&&i.due<T())return 'Overdue';if(p>0)return 'Partial';return 'Sent'}
+function fin(j){const D=S.snap;const costs=D.costs.filter(c=>c.jobId===j.id),cos=D.cos.filter(c=>c.jobId===j.id),pays=D.payments.filter(p=>p.jobId===j.id);const sco=cos.filter(c=>c.status==='Signed');const rev=n(j.contractPrice)+sum(sco,'amount');const proj=sum(costs,c=>n(c.actual)>0?c.actual:c.est)+sum(sco,'cost');return {rev,proj,margin:rev>0&&proj>0?(rev-proj)/rev:null,paid:sum(pays,'amount'),pending:cos.filter(c=>c.status==='Pending').length}}
+function apptAhead(l){if(!l.apptDate||l.lostAt||l.signedAt||l.jobId)return false;return l.apptDate>=T()}
+const t24=s=>{const m=String(s||'').trim().toLowerCase().match(/^(\d{1,2})(?::(\d{2}))?\s*(am|pm|a|p)?/);if(!m)return '9999';let h=+m[1];const ap=m[3];if(ap&&ap[0]==='p'&&h<12)h+=12;if(ap&&ap[0]==='a'&&h===12)h=0;if(!ap&&h<7)h+=12;return String(h).padStart(2,'0')+(m[2]||'00')};
+
+/* views */
+let tab='home',pf='open',jf='Active',mf='inv';
+const leads=()=>S.snap.leads.map(l=>({...l,_st:stage(l)}));
+function attention(){const t=T(),A=[];const L=leads(),D=S.snap;
+ D.invoices.forEach(i=>{if(invState(i)==='Overdue'){const j=D.jobs.find(x=>x.id===i.jobId);A.push(['r',`Invoice ${i.number||''} is ${between(i.due,t)} days past due`,`${j?j.name:''} · ${usd(n(i.amount)-invPaid(i))} still owed`])}});
+ L.filter(l=>l._st==='Quote sent'&&l.nextFollowUp&&l.nextFollowUp<t).forEach(l=>A.push(['w',`Follow up late: ${l.name}`,`${repName(l._rep)} · proposal ${usd(l.quoteAmount)} · due ${fmtD(l.nextFollowUp)}`]));
+ L.filter(l=>l._st==='Quoting'&&between(dOf(l.intakeAt),t)>2).forEach(l=>A.push(['w',`Proposal not out yet: ${l.name}`,`Intake in ${between(dOf(l.intakeAt),t)} days ago · ${repName(l._rep)}`]));
+ L.filter(l=>l._st==='New').forEach(l=>A.push(['i',`Not assigned yet: ${l.name}`,[l.city,l.source].filter(Boolean).join(' · ')]));
+ D.jobs.filter(j=>BOOKED.includes(j.stage)).forEach(j=>{const f=fin(j);if(f.margin!=null&&f.margin*100<S.snap.floorPct)A.push(['r',`${j.name} is under the margin floor`,`Projected ${pct(f.margin)} on ${usd(f.rev)}`])});
+ D.costs.filter(c=>n(c.actual)>0&&!c.paid&&c.due&&c.due<=addD(t,7)).forEach(c=>{const j=D.jobs.find(x=>x.id===c.jobId);A.push([c.due<t?'r':'w',`Bill ${c.vendor?'to '+c.vendor+' ':''}${c.due<t?'past due':'due '+fmtD(c.due)}`,`${j?j.name:''} · ${usd(c.actual)}`])});
+ return A}
+function vHome(){const D=S.snap,L=leads(),t=T();const m0=t.slice(0,7);
+ const out=L.filter(l=>['Quote sent','Accepted'].includes(l._st));const signedM=L.filter(l=>l.signedAt&&dOf(l.signedAt).slice(0,7)===m0);
+ const active=D.jobs.filter(j=>ACTIVE.includes(j.stage));const backlog=sum(active,j=>fin(j).rev);
+ const owed=D.invoices.filter(i=>i.issued&&invState(i)!=='Paid');const owedAmt=sum(owed,i=>n(i.amount)-invPaid(i));const overdue=sum(owed.filter(i=>invState(i)==='Overdue'),i=>n(i.amount)-invPaid(i));
+ const appts=L.filter(apptAhead).filter(l=>l.apptDate<=addD(t,7)).sort((a,b)=>(a.apptDate+t24(a.apptTime)).localeCompare(b.apptDate+t24(b.apptTime)));
+ const closed=L.filter(l=>['Signed','Lost'].includes(l._st));const rate=closed.length?L.filter(l=>l._st==='Signed').length/closed.length:null;
+ const A=attention();const h=new Date().getHours();
+ $('#main').innerHTML=`<section class="hero"><div class="eb">${esc(new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}))}</div><h1>${h<12?'Good morning':h<17?'Good afternoon':'Good evening'}</h1>
+  <div class="stats"><span><b>${A.length}</b>need attention</span><span><b>${appts.length}</b>appointment${appts.length===1?'':'s'} this week</span><span><b>${active.length}</b>job${active.length===1?'':'s'} building</span></div></section>
+  <div class="tiles"><div class="tile"><div class="lab">Proposals out</div><div class="val">${usdK(sum(out,'quoteAmount'))}</div><div class="note">${out.length} open</div></div>
+   <div class="tile"><div class="lab">Signed this month</div><div class="val">${usdK(sum(signedM,'quoteAmount'))}</div><div class="note">${signedM.length} job${signedM.length===1?'':'s'}</div></div>
+   <div class="tile"><div class="lab">Owed to us</div><div class="val">${usdK(owedAmt)}</div><div class="note ${overdue>0?'bad':''}">${overdue>0?usdK(overdue)+' overdue':'Nothing overdue'}</div></div>
+   <div class="tile"><div class="lab">Signed backlog</div><div class="val">${usdK(backlog)}</div><div class="note">Close rate ${pct(rate)}</div></div></div>
+  <div class="cols"><div class="card"><div class="h"><h2>Needs attention</h2><span class="pill">${A.length}</span></div>${A.length?A.slice(0,12).map(([k,t1,t2])=>`<div class="row"><div style="min-width:0"><div class="tt"><span class="dot" style="background:${k==='r'?'#B42318':k==='w'?'#995A00':'#1F5A8A'}"></span>${esc(t1)}</div><div class="mm">${esc(t2)}</div></div></div>`).join(''):'<div class="empty">Nothing needs attention right now.</div>'}</div>
+  <div class="card"><div class="h"><h2>Next 7 days</h2><button class="btn" type="button" data-tab="cal">Calendar</button></div>${appts.length?appts.map(l=>`<div class="row"><div style="min-width:0"><div class="tt">${esc(l.name)}</div><div class="mm"><span class="dot" style="background:${repColor(l._rep)}"></span>${esc([dayName(l.apptDate)+(l.apptTime?' '+l.apptTime:''),l.city,repName(l._rep)].filter(Boolean).join(' · '))}</div></div></div>`).join(''):'<div class="empty">No appointments booked this week.</div>'}</div></div>`}
+function vPipe(){const L=leads().sort((a,b)=>n(b.updated||b.created)-n(a.updated||a.created));const F={open:l=>!['Signed','Lost'].includes(l._st),out:l=>['Quote sent','Accepted'].includes(l._st),signed:l=>l._st==='Signed',lost:l=>l._st==='Lost',all:()=>true};
+ const V=L.filter(F[pf]);const by={};V.forEach(l=>(by[l._st]=by[l._st]||[]).push(l));
+ $('#main').innerHTML=`<h1>Pipeline</h1><p class="sub">${L.filter(F.open).length} open leads · ${usd(sum(L.filter(F.out),'quoteAmount'))} in proposals out</p>
+  <div class="seg">${[['open','Open'],['out','Proposals out'],['signed','Signed'],['lost','Lost'],['all','All']].map(([k,t])=>`<button type="button" data-pf="${k}" aria-pressed="${pf===k}">${t}<i>${L.filter(F[k]).length}</i></button>`).join('')}</div>
+  ${V.length?STG.filter(s=>by[s]).map(s=>`<div class="card"><div class="h"><h2>${STGL[s]}</h2><span class="pill">${by[s].length}</span></div>${by[s].map(l=>`<div class="row"><div style="min-width:0"><div class="tt">${esc(l.name||'Lead')}</div><div class="mm"><span class="dot" style="background:${repColor(l._rep)}"></span>${esc([repName(l._rep),bld(l),l.city].filter(Boolean).join(' · '))}</div>${l.apptDate&&s==='Appointment set'?`<div class="mm">Appointment ${esc(dayName(l.apptDate))}${l.apptTime?' at '+esc(l.apptTime):''}</div>`:''}${s==='Quote sent'&&l.nextFollowUp?`<div class="mm">Follow up ${esc(fmtD(l.nextFollowUp))}${l.nextFollowUp<T()?' · <b style="color:var(--bad)">late</b>':''}</div>`:''}${s==='Lost'&&l.lostReason?`<div class="mm">${esc(l.lostReason)}</div>`:''}</div><div class="r">${l.quoteAmount?`<div class="amt">${usd(l.quoteAmount)}</div>`:''}</div></div>`).join('')}</div>`).join(''):'<div class="card"><div class="empty">Nothing here right now.</div></div>'}`}
+function vCal(){const t=T();const L=leads().filter(l=>l.apptDate&&l.apptDate>=addD(t,-1)&&!l.lostAt).sort((a,b)=>(a.apptDate+t24(a.apptTime)).localeCompare(b.apptDate+t24(b.apptTime)));let last='';
+ $('#main').innerHTML=`<h1>Calendar</h1><p class="sub">Every salesman's appointments from yesterday on</p><div class="card">${L.length?L.map(l=>{const h=l.apptDate!==last?`<div class="dayh">${esc(dayName(l.apptDate))}</div>`:'';last=l.apptDate;return h+`<div class="row" style="border-top:0"><div style="min-width:0"><div class="tt">${esc(l.apptTime||'Time not set')} · ${esc(l.name)}</div><div class="mm"><span class="dot" style="background:${repColor(l._rep)}"></span>${esc([repName(l._rep),[l.address,l.city].filter(Boolean).join(', '),bld(l)].filter(Boolean).join(' · '))}</div></div><div class="r"><span class="pill ${l._st==='Appointment set'?'i':'g'}">${esc(STGL[l._st])}</span></div></div>`}).join(''):'<div class="empty">No appointments on the calendar.</div>'}</div>`}
+function vJobs(){const J=S.snap.jobs;const G={Active:j=>ACTIVE.includes(j.stage),Bidding:j=>['Lead','Estimating','Quote sent'].includes(j.stage||'Lead'),Complete:j=>j.stage==='Complete',All:()=>true};const V=J.filter(G[jf]).sort((a,b)=>String(b.signedDate||'').localeCompare(String(a.signedDate||'')));
+ $('#main').innerHTML=`<h1>Jobs</h1><p class="sub">${J.filter(G.Active).length} active · ${usdK(sum(J.filter(G.Active),j=>fin(j).rev))} signed backlog</p>
+  <div class="seg">${Object.keys(G).map(k=>`<button type="button" data-jf="${k}" aria-pressed="${jf===k}">${k}<i>${J.filter(G[k]).length}</i></button>`).join('')}</div>
+  <div class="card">${V.length?V.map(j=>{const f=fin(j);const ck=j.checklist||{};const done=CHECK.filter(k=>ck[k]).length;const mc=f.margin==null?'':f.margin*100<S.snap.floorPct?'r':f.margin*100<S.snap.targetPct?'w':'g';
+   return `<div class="row"><div style="min-width:0"><div class="tt">${esc(j.name)}</div><div class="mm">${esc([j.client,j.city,j.pm?'PM '+j.pm:''].filter(Boolean).join(' · '))}</div><div class="mm">${done} of ${CHECK.length} steps done${f.pending?` · ${f.pending} change order${f.pending>1?'s':''} waiting`:''}</div><div class="bar"><i style="width:${Math.round(100*done/CHECK.length)}%"></i></div></div>
+   <div class="r"><div style="display:flex;gap:6px;justify-content:flex-end;margin-bottom:4px"><span class="pill ${j.stage==='Complete'?'g':'i'}">${esc(j.stage||'Lead')}</span>${f.margin!=null?`<span class="pill ${mc}">${pct(f.margin)}</span>`:''}</div><div class="amt">${usd(f.rev)}</div><div class="mm">${usd(f.paid)} collected</div></div></div>`}).join(''):'<div class="empty">No jobs here yet.</div>'}</div>`}
+function vMoney(){const D=S.snap,t=T();const inv=D.invoices.map(i=>({...i,_s:invState(i),_bal:n(i.amount)-invPaid(i)}));const open=inv.filter(i=>i.issued&&i._s!=='Paid');
+ const bills=D.costs.filter(c=>n(c.actual)>0&&!c.paid).sort((a,b)=>String(a.due||'9').localeCompare(String(b.due||'9')));const pays=[...D.payments].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,20);
+ const booked=D.jobs.filter(j=>BOOKED.includes(j.stage)).map(fin).filter(f=>f.margin!=null);const gm=sum(booked,'rev')>0?(sum(booked,'rev')-sum(booked,'proj'))/sum(booked,'rev'):null;
+ const jn=id=>(D.jobs.find(j=>j.id===id)||{}).name||'';
+ $('#main').innerHTML=`<h1>Money</h1><p class="sub">What is owed to us, what we owe, and what came in</p>
+  <div class="tiles"><div class="tile"><div class="lab">Owed to us</div><div class="val">${usdK(sum(open,'_bal'))}</div><div class="note ${open.some(i=>i._s==='Overdue')?'bad':''}">${usdK(sum(open.filter(i=>i._s==='Overdue'),'_bal'))} overdue</div></div>
+   <div class="tile"><div class="lab">We owe</div><div class="val">${usdK(sum(bills,'actual'))}</div><div class="note">${bills.length} unpaid bill${bills.length===1?'':'s'}</div></div>
+   <div class="tile"><div class="lab">Collected, 30 days</div><div class="val">${usdK(sum(D.payments.filter(p=>p.date&&between(p.date,t)<=30),'amount'))}</div><div class="note">${D.payments.filter(p=>p.date&&between(p.date,t)<=30).length} payments</div></div>
+   <div class="tile"><div class="lab">Gross margin, booked</div><div class="val">${pct(gm)}</div><div class="note">Target ${S.snap.targetPct}% · floor ${S.snap.floorPct}%</div></div></div>
+  <div class="seg">${[['inv','Invoices'],['bills','Bills to pay'],['pays','Payments in']].map(([k,l])=>`<button type="button" data-mf="${k}" aria-pressed="${mf===k}">${l}</button>`).join('')}</div>
+  <div class="card tscroll">${mf==='inv'?(inv.length?`<table><tr><th>Invoice</th><th>Job</th><th>Due</th><th class="r">Billed</th><th class="r">Balance</th><th>Status</th></tr>${inv.sort((a,b)=>String(a.due||'9').localeCompare(String(b.due||'9'))).map(i=>`<tr><td>${esc(i.number||'')}</td><td>${esc(jn(i.jobId))}</td><td>${esc(fmtD(i.due))}</td><td class="r">${usd(i.amount)}</td><td class="r">${usd(i._bal)}</td><td><span class="pill ${i._s==='Overdue'?'r':i._s==='Paid'?'g':i._s==='Partial'?'w':'i'}">${i._s}</span></td></tr>`).join('')}</table>`:'<div class="empty">No invoices yet.</div>')
+   :mf==='bills'?(bills.length?`<table><tr><th>Due</th><th>Vendor</th><th>Job</th><th>What</th><th class="r">Amount</th></tr>${bills.map(c=>`<tr><td>${c.due&&c.due<t?'<b style="color:var(--bad)">'+esc(fmtD(c.due))+'</b>':esc(fmtD(c.due))}</td><td>${esc(c.vendor||'')}</td><td>${esc(jn(c.jobId))}</td><td>${esc(c.description||c.category||'')}</td><td class="r">${usd(c.actual)}</td></tr>`).join('')}</table>`:'<div class="empty">No unpaid bills.</div>')
+   :(pays.length?`<table><tr><th>Date</th><th>Job</th><th>Method</th><th class="r">Amount</th></tr>${pays.map(p=>`<tr><td>${esc(fmtD(p.date))}</td><td>${esc(jn(p.jobId))}</td><td>${esc(p.method||'')}</td><td class="r">${usd(p.amount)}</td></tr>`).join('')}</table>`:'<div class="empty">No payments recorded yet.</div>')}</div>`}
+function vTeam(){const L=leads(),t=T();const ids=[...new Set([...Object.keys(S.snap.team||{}),...L.map(l=>l._rep).filter(Boolean)])];
+ $('#main').innerHTML=`<h1>Salesmen</h1><p class="sub">What each salesman has going, all time unless noted</p><div class="card">${ids.length?ids.map(id=>{const X=L.filter(l=>l._rep===id);const open=X.filter(l=>!['Signed','Lost'].includes(l._st));const wk=X.filter(apptAhead).filter(l=>l.apptDate<=addD(t,7)).length;const out=X.filter(l=>['Quote sent','Accepted'].includes(l._st));const sg=X.filter(l=>l._st==='Signed');const cl=X.filter(l=>['Signed','Lost'].includes(l._st));const late=X.filter(l=>l._st==='Quote sent'&&l.nextFollowUp&&l.nextFollowUp<t).length;const nx=X.filter(apptAhead).sort((a,b)=>(a.apptDate+t24(a.apptTime)).localeCompare(b.apptDate+t24(b.apptTime)))[0];
+   return `<div class="row"><div style="min-width:0"><div class="tt"><span class="dot" style="background:${repColor(id)}"></span>${esc(repName(id))}</div><div class="mm">${open.length} open · ${wk} appointment${wk===1?'':'s'} this week · ${out.length} proposal${out.length===1?'':'s'} out${late?` · <b style="color:var(--bad)">${late} follow up${late>1?'s':''} late</b>`:''}</div><div class="mm">${nx?'Next: '+esc(dayName(nx.apptDate))+(nx.apptTime?' '+esc(nx.apptTime):'')+' · '+esc(nx.name):'Nothing booked'}</div></div><div class="r"><div class="amt">${usd(sum(sg,'quoteAmount'))}</div><div class="mm">${sg.length} signed · ${cl.length?Math.round(100*sg.length/cl.length)+'% close':'no closes yet'}</div></div></div>`}).join(''):'<div class="empty">No salesmen yet.</div>'}</div>`}
+function render(){document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.tab===tab)));
+ $('#upd').textContent=S.snap?'Updated '+new Date(S.snap.gen).toLocaleString('en-US',{weekday:'short',hour:'numeric',minute:'2-digit'}):'';
+ ({home:vHome,pipe:vPipe,cal:vCal,jobs:vJobs,money:vMoney,team:vTeam})[tab]()}
+function showApp(){$('#lockv').hidden=true;$('#appv').hidden=false;render()}
+function showLock(msg){$('#appv').hidden=true;$('#lockv').hidden=false;$('#err').textContent=msg||'';$('#code').value=''}
+async function refresh(quiet){if(!S.code)return;try{S.snap=await load(S.code);S.at=Date.now();save();if(!$('#appv').hidden)render()}catch(e){if(e.message==='nocode'){S.code='';S.snap=null;save();showLock('That code did not open anything. Check it with the office.')}}}
+document.addEventListener('click',async e=>{const t=e.target.closest('button');if(!t)return;
+ if(t.dataset.tab){tab=t.dataset.tab;render();window.scrollTo(0,0);return}
+ if(t.dataset.pf){pf=t.dataset.pf;vPipe();return}if(t.dataset.jf){jf=t.dataset.jf;vJobs();return}if(t.dataset.mf){mf=t.dataset.mf;vMoney();return}
+ if(t.id==='open'){const c=$('#code').value.trim().toLowerCase().replace(/[^a-z0-9]/g,'');if(!c){$('#err').textContent='Enter your office code';return}t.textContent='Opening';$('#err').textContent='';
+  try{const d=await load(c);S.code=c;S.snap=d;S.at=Date.now();save();showApp()}catch(err){$('#err').textContent=err.message==='nocode'?'That code did not open anything. Check it with the office.':'No signal right now. Try again in a moment.'}t.textContent='Open'}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='code')$('#open').click()});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&Date.now()-S.at>5*60000)refresh(true)});
+if(S.code&&S.snap){showApp();refresh(true)}else showLock();
+})();
+</script></body></html>
