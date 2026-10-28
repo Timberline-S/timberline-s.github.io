@@ -282,9 +282,10 @@ function vHome(){
   const tips=(G().find(s=>/sets us apart/i.test(s.h))||{items:[]}).items;const tip=tips.length?tips[new Date().getDate()%tips.length]:'';
   const wk=S.sent.filter(s=>Date.now()-s.at<7*864e5).length;
   $('#main').innerHTML=`<div class="hm"><div class="c1"><section class="hero"><div class="eb">${esc(new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}))}</div><h1>${greet()}${S.name?', '+esc(S.name):''}</h1>
-   <div class="stats"><span><b>${Object.keys(S.drafts).length}</b>in progress</span><span><b>${wk}</b>sent this week</span>${S.sched&&S.sched.clients?(n=>`<span><b>${n}</b>proposal${n===1?'':'s'} out</span>`)(CL().filter(c=>c.stage==='Quote sent'||c.stage==='Accepted').length):`<span><b>${S.sent.length}</b>sent total</span>`}</div></section>
+   <div class="stats">${toCall().length?`<span><b>${toCall().length}</b>to call</span>`:''}<span><b>${Object.keys(S.drafts).length}</b>in progress</span><span><b>${wk}</b>sent this week</span>${S.sched&&S.sched.clients?(n=>`<span><b>${n}</b>proposal${n===1?'':'s'} out</span>`)(CL().filter(c=>c.stage==='Quote sent'||c.stage==='Accepted').length):`<span><b>${S.sent.length}</b>sent total</span>`}</div></section>
    <button class="big" data-new type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Start a new intake</button>
    ${(()=>{const U=upcoming();return U.length?`<div class="card"><div class="h"><h2>Next appointment</h2><button class="btn sm ghost" type="button" data-tab="schedule">All ${U.length}</button></div>${apptCard(U[0])}</div>`:''})()}
+   ${callSection()}
    ${Object.keys(S.drafts).length?`<div class="card"><div class="h"><h2>In progress</h2><span class="pill">${Object.keys(S.drafts).length}</span></div>${draftRows()}</div>`:''}
    </div><div class="c2">${statsCard()}
    ${tip?`<div class="card"><div class="pad tip"><i>✓</i><div><b style="display:block;margin-bottom:2px">Say this today</b><span style="color:var(--ink2)">${esc(tip)}</span></div></div></div>`:''}
@@ -441,6 +442,12 @@ async function loadSched(){
 }
 const isoD=x=>x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
 const dayKey=d=>{const t=new Date();const tm=new Date(t);tm.setDate(t.getDate()+1);return d===isoD(t)?'Today':d===isoD(tm)?'Tomorrow':new Date(d+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'})};
+function toCall(){return ((S.sched&&S.sched.toCall)||[]).slice()}
+function callCard(c){const place=[c.address,c.city].filter(Boolean).join(', ');const ph=String(c.phone||'').replace(/[^0-9+]/g,'');const first=String(c.name||'').trim().split(/\s+/)[0]||'there';const msg=c.reason?'Hi '+first+', this is '+(S.name||'Jay')+' with Timberline Builders. We need to move our appointment for your '+(c.building||'building')+'. What day and time works best for you this week?':'Hi '+first+', this is '+(S.name||'Jay')+' with Timberline Builders. Thanks for reaching out about your '+(c.building||'building')+'. I would like to come out, walk the site and get measurements so we can put together an accurate price. What day works best for you this week?';
+  return `<div class="appt"><div class="tm" style="font-size:15px">${c.reason?'Move':'Call'}<small>${c.assignedAt?'Added '+esc(new Date(c.assignedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'})):'New lead'}</small></div><div style="min-width:0">${c.reason?`<span class="pill w" style="margin-bottom:6px">${esc(c.reason)}</span>`:''}<div class="nm">${esc(c.name||'Client')}</div><div class="mt">${esc([cap(c.building||''),place].filter(Boolean).join(' · '))}</div>${c.phone?`<div class="mt">${esc(c.phone)}</div>`:''}
+   ${c.notes?`<div class="note">${esc(c.notes)}</div>`:''}
+   <div class="acts">${ph?`<a class="btn sm pri" href="tel:${esc(ph)}" target="_top">Call</a><a class="btn sm" href="sms:${esc(ph)}?&body=${encodeURIComponent(msg)}" target="_top">Text</a>`:''}${c.email?`<a class="btn sm" href="mailto:${esc(c.email)}" target="_top">Email</a>`:''}</div></div></div>`}
+function callSection(){const L=toCall();if(!L.length)return '';return `<div class="card"><div class="h"><h2>Call and schedule</h2><span class="pill w">${L.length}</span></div><div class="pad" style="padding-bottom:0;font-size:14px;color:var(--muted)">These clients are waiting to hear from you. Call them, set up a site visit, then send the day and time to the office so it goes on your schedule.</div>${L.map(callCard).join('')}</div>`}
 function upcoming(){const L=(S.sched&&S.sched.appts)||[];const td=isoD(new Date());return L.filter(a=>a.date>=td).sort((a,b)=>(a.date+(a.t24||'99')).localeCompare(b.date+(b.t24||'99')))}
 function gcal(a,place){if(!a.date)return '';const d=a.date.replace(/-/g,'');let dates;if(/^\d{4}$/.test(a.t24||'')){const h=+a.t24.slice(0,2),mi=a.t24.slice(2);const e=String(Math.min(h+1,23)).padStart(2,'0');dates=d+'T'+a.t24+'00/'+d+'T'+e+mi+'00'}else{const n=new Date(a.date+'T12:00:00');n.setDate(n.getDate()+1);dates=d+'/'+isoD(n).replace(/-/g,'')}
   return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Timberline: '+(a.name||'Client')+(a.building||a.type?' · '+cap(a.building||a.type):''))+'&dates='+dates+'&ctz=America/Boise'+(place?'&location='+encodeURIComponent(place+', Idaho'):'')+'&details='+encodeURIComponent([a.phone?'Phone: '+a.phone:'',a.notes||''].filter(Boolean).join('\n'))}
@@ -453,6 +460,7 @@ function vSchedule(){
   const U=upcoming();let last='';const mv=S.sv==='month';
   const st=S.schedErr==='nocode'?`<div class="miss" style="margin:14px 0 0">That schedule code was not found. Check it with the office.</div>`:'';
   $('#main').innerHTML=`<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px"><div><h1>Schedule</h1><p class="sub">${S.sched&&S.sched.updated?'Updated '+esc(new Date(S.sched.updated).toLocaleString('en-US',{weekday:'short',hour:'numeric',minute:'2-digit'}))+(S.schedErr==='offline'?' · offline, showing the last copy':''):S.schedErr==='offline'?'No signal right now':S.schedErr==='nocode'?'Code not found':'Loading your appointments'}</p></div><button class="btn sm" type="button" data-refresh>Refresh</button></div>${st}
+   ${callSection()}
    <div class="seg" role="group" aria-label="View"><button type="button" data-sv="list" aria-pressed="${!mv}">List</button><button type="button" data-sv="month" aria-pressed="${mv}">Month</button></div>
    ${mv?monthView():`<div class="card">${U.length?U.map(a=>{const h=a.date!==last?`<div class="dayh">${esc(dayKey(a.date))}</div>`:'';last=a.date;return h+apptCard(a,1)}).join(''):`<div class="empty">${S.schedErr==='nocode'?'Tap your name at the top to fix the code.':(!S.sched&&S.schedErr==='offline')?'You are offline. Your appointments show as soon as you have signal.':S.sched?'No upcoming appointments. New ones show here within the hour after the office adds them.':'Checking for appointments.'}</div>`}</div>`}
    <p class="sub" style="font-size:13px;margin-top:12px">Tap Start intake at the site and the client’s details are filled in for you.</p>`;
@@ -527,7 +535,7 @@ document.addEventListener('change',e=>{const el=e.target;if(el.id==='ph'){const 
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet')closeSheet()});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='nm'){e.preventDefault();$('[data-savename]').click()}});
 
-const BUILD='1793135148';
+const BUILD='1793219044';
 async function checkVer(){if(!/github\.io$/.test(location.hostname)||BUILD.indexOf('__')===0)return;try{const r=await fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)return;const m=(await r.text()).match(/const BUILD='(\d+)'/);if(m&&m[1]!==BUILD&&!(tab==='intake'&&draft())){persist();location.reload()}}catch(e){}}
 setTimeout(checkVer,1500);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState!=='visible')return;checkVer();if(S.code&&Date.now()-(S.schedAt||0)>5*60000)loadSched()});
