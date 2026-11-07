@@ -138,6 +138,16 @@ h2{font:700 18px var(--display);letter-spacing:-.02em;margin:0}
 .sheet .box{grid-template-columns:minmax(0,1fr);background:#fff;width:100%;max-width:560px;border-radius:24px 24px 0 0;padding:22px 20px calc(20px + env(safe-area-inset-bottom,0px));display:grid;gap:12px;max-height:92vh;overflow:auto}
 @media(prefers-reduced-motion:no-preference){.sheet.on .box{animation:up .22s cubic-bezier(.2,.8,.2,1)}@keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}}
 .sheet h3{font:800 20px var(--display);margin:0}.sheet p{margin:0;color:var(--muted)}
+.rs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rs button{height:48px;border:1px solid var(--line2);background:#fff;border-radius:13px;font:600 14.5px var(--font);color:var(--ink)}
+.rs button[aria-pressed="true"]{background:var(--soft);border-color:var(--accent);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.lf{display:grid;gap:6px}.lf label{font-size:13px;font-weight:650;color:var(--ink2)}
+.lf input,.lf select,.lf textarea{width:100%;min-width:0;height:46px;border:1px solid var(--line2);border-radius:13px;padding:0 12px;background:#fff;font:15px var(--font);color:var(--ink)}
+.lf textarea{height:84px;padding:10px 12px;resize:vertical}
+.lf2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lastc{margin-top:8px;font-size:13px;color:var(--ink2)}.lastc b{color:var(--ink)}
+.outbox{display:flex;align-items:center;gap:12px;justify-content:space-between;background:var(--warnsoft);border:1px solid #EBC77A;border-radius:16px;padding:14px 16px;margin-top:16px}
+.outbox b{display:block}.outbox span{font-size:13.5px;color:var(--ink2)}
 .addr{display:flex;gap:8px;min-width:0}.addr .btn{flex:none}.addr input{flex:1;min-width:0;height:46px;border:1px solid var(--line2);border-radius:13px;padding:0 12px;background:var(--sunk)}
 .appt{display:grid;grid-template-columns:64px minmax(0,1fr);gap:14px;padding:16px 18px;border-top:1px solid var(--line)}
 .appt:first-child{border-top:0}
@@ -205,7 +215,7 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',2600)}
 
 /* storage */
-let S={name:'',drafts:{},sent:[],pb:{},cur:null};
+let S={name:'',drafts:{},sent:[],pb:{},cur:null,log:{},mine:[],out:[]};
 try{const j=JSON.parse(localStorage.getItem(KEY)||'null');if(j)S={...S,...j}}catch(e){}
 try{const old=JSON.parse(localStorage.getItem('tl-intake-draft')||'null');if(old&&old.name&&!Object.keys(S.drafts).length){const id=uid();delete old._lid;S.drafts[id]={id,v:old,step:0,created:Date.now(),updated:Date.now()};localStorage.removeItem('tl-intake-draft')}}catch(e){}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(S));const w=$('#wsaved');if(w)w.textContent='Saved on this phone '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}catch(e){const w=$('#wsaved');if(w)w.textContent='This phone is not letting the page save. Finish and send before closing.'}}
@@ -282,8 +292,9 @@ function vHome(){
   const tips=(G().find(s=>/sets us apart/i.test(s.h))||{items:[]}).items;const tip=tips.length?tips[new Date().getDate()%tips.length]:'';
   const wk=S.sent.filter(s=>Date.now()-s.at<7*864e5).length;
   $('#main').innerHTML=`<div class="hm"><div class="c1"><section class="hero"><div class="eb">${esc(new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}))}</div><h1>${greet()}${S.name?', '+esc(S.name):''}</h1>
-   <div class="stats">${toCall().length?`<span><b>${toCall().length}</b>to call</span>`:''}<span><b>${Object.keys(S.drafts).length}</b>in progress</span><span><b>${wk}</b>sent this week</span>${S.sched&&S.sched.clients?(n=>`<span><b>${n}</b>proposal${n===1?'':'s'} out</span>`)(CL().filter(c=>c.stage==='Quote sent'||c.stage==='Accepted').length):`<span><b>${S.sent.length}</b>sent total</span>`}</div></section>
+   <div class="stats">${toCall().length?`<span><b>${toCall().length}</b>to call</span>`:''}${callsToday()?(n=>`<span><b>${n}</b>call${n===1?'':'s'} today</span>`)(callsToday()):''}<span><b>${Object.keys(S.drafts).length}</b>in progress</span><span><b>${wk}</b>sent this week</span>${S.sched&&S.sched.clients?(n=>`<span><b>${n}</b>proposal${n===1?'':'s'} out</span>`)(CL().filter(c=>c.stage==='Quote sent'||c.stage==='Accepted').length):`<span><b>${S.sent.length}</b>sent total</span>`}</div></section>
    <button class="big" data-new type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Start a new intake</button>
+   ${outboxBar()}
    ${(()=>{const U=upcoming();return U.length?`<div class="card"><div class="h"><h2>Next appointment</h2><button class="btn sm ghost" type="button" data-tab="schedule">All ${U.length}</button></div>${apptCard(U[0])}</div>`:''})()}
    ${callSection()}
    ${Object.keys(S.drafts).length?`<div class="card"><div class="h"><h2>In progress</h2><span class="pill">${Object.keys(S.drafts).length}</span></div>${draftRows()}</div>`:''}
@@ -442,12 +453,68 @@ async function loadSched(){
 }
 const isoD=x=>x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
 const dayKey=d=>{const t=new Date();const tm=new Date(t);tm.setDate(t.getDate()+1);return d===isoD(t)?'Today':d===isoD(tm)?'Tomorrow':new Date(d+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'})};
-function toCall(){return ((S.sched&&S.sched.toCall)||[]).slice()}
+const RES=[['noanswer','No answer'],['voicemail','Left voicemail'],['texted','Texted'],['talked','Talked, call back'],['appt','Appointment set'],['notint','Not interested'],['wrong','Wrong number']];
+const RL=Object.fromEntries(RES);const FINAL=['appt','notint','wrong'];
+const SRC=['','Door knock','Referral','Drive by','Called in','Facebook','Website','Other'];
+const TYPES=(F.find(f=>f.k==='type')||{o:['']}).o;
+function mineOf(c){if(!c)return null;if(c.mine)return c;const ph=d10(c.phone);return (S.mine||[]).find(m=>m.id===c.id||(ph&&d10(m.phone)===ph))||null}
+function logKey(c){const m=mineOf(c);return m?m.id:c.id}
+function lastLog(c){const k=logKey(c);const L=(S.log||{})[k]||((S.log||{})[c.id])||[];return L[L.length-1]||null}
+function liveMine(){const all=[...((S.sched&&S.sched.toCall)||[]),...CL(),...((S.sched&&S.sched.appts)||[])];return (S.mine||[]).filter(m=>!all.some(c=>c.id===m.id||(d10(m.phone)&&d10(c.phone)===d10(m.phone))))}
+function toCall(){const L=[...((S.sched&&S.sched.toCall)||[]),...liveMine().map(m=>({...m,mine:true}))];const td=isoD(new Date());
+  return L.filter(c=>{const l=lastLog(c);return !(l&&FINAL.includes(l.r))}).sort((a,b)=>{const na=(lastLog(a)||{}).next||'',nb=(lastLog(b)||{}).next||'';const da=na&&na<=td?0:na?2:1,db=nb&&nb<=td?0:nb?2:1;return da-db||(na||'').localeCompare(nb||'')})}
+function callsToday(){const t0=new Date();t0.setHours(0,0,0,0);return Object.values(S.log||{}).flat().filter(x=>x.at>=t0.getTime()).length}
+function lastLine(l){if(!l)return '';const td=isoD(new Date());return `<div class="lastc"><b>${esc(RL[l.r]||l.r)}</b> · ${esc(shortD(l.at))}${l.next?` · <span style="color:${l.next<=td?'var(--warn)':'inherit'};font-weight:${l.next<=td?700:400}">Call back ${esc(dayKey(l.next))}</span>`:''}${l.note?`<br>${esc(l.note)}`:''}</div>`}
 function callCard(c){const place=[c.address,c.city].filter(Boolean).join(', ');const ph=String(c.phone||'').replace(/[^0-9+]/g,'');const first=String(c.name||'').trim().split(/\s+/)[0]||'there';const msg=c.reason?'Hi '+first+', this is '+(S.name||'Jay')+' with Timberline Builders. We need to move our appointment for your '+(c.building||'building')+'. What day and time works best for you this week?':'Hi '+first+', this is '+(S.name||'Jay')+' with Timberline Builders. Thanks for reaching out about your '+(c.building||'building')+'. I would like to come out, walk the site and get measurements so we can put together an accurate price. What day works best for you this week?';
-  return `<div class="appt"><div class="tm" style="font-size:15px">${c.reason?'Move':'Call'}<small>${c.assignedAt?'Added '+esc(new Date(c.assignedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'})):'New lead'}</small></div><div style="min-width:0">${c.reason?`<span class="pill w" style="margin-bottom:6px">${esc(c.reason)}</span>`:''}<div class="nm">${esc(c.name||'Client')}</div><div class="mt">${esc([cap(c.building||''),place].filter(Boolean).join(' · '))}</div>${c.phone?`<div class="mt">${esc(c.phone)}</div>`:''}
-   ${c.notes?`<div class="note">${esc(c.notes)}</div>`:''}
-   <div class="acts">${ph?`<a class="btn sm pri" href="tel:${esc(ph)}" target="_top">Call</a><a class="btn sm" href="sms:${esc(ph)}?&body=${encodeURIComponent(msg)}" target="_top">Text</a>`:''}${c.email?`<a class="btn sm" href="mailto:${esc(c.email)}" target="_top">Email</a>`:''}</div></div></div>`}
-function callSection(){const L=toCall();if(!L.length)return '';return `<div class="card"><div class="h"><h2>Call and schedule</h2><span class="pill w">${L.length}</span></div><div class="pad" style="padding-bottom:0;font-size:14px;color:var(--muted)">These clients are waiting to hear from you. Call them, set up a site visit, then send the day and time to the office so it goes on your schedule.</div>${L.map(callCard).join('')}</div>`}
+  const l=lastLog(c);const added=c.mine?'Added '+shortD(c.created):c.assignedAt?'Added '+esc(new Date(c.assignedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'})):'New lead';
+  return `<div class="appt"><div class="tm" style="font-size:15px">${c.reason?'Move':l?'Again':'Call'}<small>${esc(added)}</small></div><div style="min-width:0">${c.reason?`<span class="pill w" style="margin-bottom:6px">${esc(c.reason)}</span>`:''}${c.mine?`<span class="pill g" style="margin-bottom:6px">Your lead${c.source?': '+esc(c.source):''}</span>`:''}<div class="nm">${esc(c.name||'Client')}</div><div class="mt">${esc([cap(c.building||''),place].filter(Boolean).join(' · '))}</div>${c.phone?`<div class="mt">${esc(c.phone)}</div>`:''}
+   ${c.notes?`<div class="note">${esc(c.notes)}</div>`:''}${lastLine(l)}
+   <div class="acts">${ph?`<a class="btn sm" href="tel:${esc(ph)}" target="_top">Call</a><a class="btn sm" href="sms:${esc(ph)}?&body=${encodeURIComponent(msg)}" target="_top">Text</a>`:''}${c.email?`<a class="btn sm" href="mailto:${esc(c.email)}" target="_top">Email</a>`:''}<button class="btn sm pri" type="button" data-logc="${esc(c.id)}">Log result</button></div></div></div>`}
+function outboxBar(){const n=(S.out||[]).length;if(!n)return '';return `<div class="outbox"><div><b>${n} update${n===1?'':'s'} for the office</b><span>Calls and leads only reach the office after you send them.</span></div><button class="btn sm pri" type="button" data-sendout>Send</button></div>`}
+function callSection(){const L=toCall();return `<div class="card"><div class="h"><h2>Call and schedule</h2><span style="display:flex;gap:8px;align-items:center">${L.length?`<span class="pill w">${L.length}</span>`:''}<button class="btn sm" type="button" data-addlead>Add a lead</button></span></div>${L.length?`<div class="pad" style="padding-bottom:0;font-size:14px;color:var(--muted)">Call each one, then tap Log result. Set appointments go to the office for your schedule.</div>${L.map(callCard).join('')}`:`<div class="empty">No one waiting on a call. Tap Add a lead when you find a new one.</div>`}</div>`}
+function findCall(id){return [...((S.sched&&S.sched.toCall)||[]),...(S.mine||[]).map(m=>({...m,mine:true}))].find(c=>c.id===id)}
+function logSheet(id){const c=findCall(id);if(!c)return;logSheet.ctx={id,r:''};
+  openSheet(`<h3>${esc(c.name||'Client')}</h3><p>How did the call go?</p><div class="rs">${RES.map(([k,l])=>`<button type="button" data-res="${k}" aria-pressed="false"${k==='appt'?' style="grid-column:1/-1"':''}>${l}</button>`).join('')}</div>
+   <div id="lgx"></div><div class="lf"><label for="lgn">Notes</label><textarea id="lgn" placeholder="What they said, best time to call, anything for the office"></textarea></div>
+   <button class="big" type="button" data-savelog style="margin-top:4px">Save</button><button class="btn ghost" type="button" data-close>Cancel</button>`)}
+function logExtra(r){const x=$('#lgx');if(!x)return;const tm=isoD(new Date(Date.now()+864e5));
+  x.innerHTML=r==='appt'?`<div class="lf2"><div class="lf"><label for="lgd">Appointment day</label><input id="lgd" type="date" value="${tm}"></div><div class="lf"><label for="lgt">Time</label><input id="lgt" type="time" value="10:00"></div></div>`:['noanswer','voicemail','texted','talked'].includes(r)?`<div class="lf"><label for="lgnx">Call back on</label><input id="lgnx" type="date" value="${r==='talked'?'':tm}"></div>`:''}
+const t12=v=>{if(!/^\d{2}:\d{2}$/.test(v||''))return '';let [h,m]=v.split(':').map(Number);const ap=h>=12?'pm':'am';h=h%12||12;return h+(m?':'+String(m).padStart(2,'0'):'')+' '+ap};
+function saveLog(){const ctx=logSheet.ctx;const c=findCall(ctx.id);if(!c)return;if(!ctx.r){toast('Pick how the call went');return}
+  const v=s=>(($(s)||{}).value||'').trim();const e={at:Date.now(),r:ctx.r,note:v('#lgn')};
+  if(ctx.r==='appt'){e.date=v('#lgd');e.time=t12(v('#lgt'));if(!e.date){toast('Pick the appointment day');return}}else if(v('#lgnx'))e.next=v('#lgnx');
+  const k=logKey(c);S.log=S.log||{};(S.log[k]=S.log[k]||[]).push(e);
+  S.out=S.out||[];S.out.push({k:'call',ref:c.mine?'':c.id,fref:c.mine?c.id:'',name:c.name||'',phone:c.phone||'',...e});persist();closeSheet();render();
+  if(ctx.r==='appt'){sendOut();toast('Send this so the office puts it on your schedule')}else toast('Saved')}
+function leadSheet(){if(!S.name){askName(leadSheet);return}
+  const sel=(id,o)=>`<select id="${id}">${o.map(x=>`<option value="${esc(x)}">${esc(x||'Pick one')}</option>`).join('')}</select>`;
+  openSheet(`<h3>Add a lead</h3><p>Someone you found. It goes on your call list now and to the office when you send.</p>
+   <div class="lf"><label for="nl_name">Client name</label><input id="nl_name" autocomplete="off"></div>
+   <div class="lf2"><div class="lf"><label for="nl_phone">Phone</label><input id="nl_phone" type="tel" inputmode="tel"></div><div class="lf"><label for="nl_email">Email</label><input id="nl_email" type="email" autocapitalize="off"></div></div>
+   <div class="lf"><label for="nl_address">Address</label><input id="nl_address"></div>
+   <div class="lf2"><div class="lf"><label for="nl_city">City</label><input id="nl_city"></div><div class="lf"><label for="nl_size">Size</label><input id="nl_size" placeholder="30x40"></div></div>
+   <div class="lf2"><div class="lf"><label for="nl_type">Building</label>${sel('nl_type',TYPES)}</div><div class="lf"><label for="nl_src">How you found them</label>${sel('nl_src',SRC)}</div></div>
+   <div class="lf"><label for="nl_notes">Notes</label><textarea id="nl_notes" placeholder="What they want, timing, best time to call"></textarea></div>
+   <button class="big" type="button" data-savelead style="margin-top:4px">Add to my call list</button><button class="btn ghost" type="button" data-close>Cancel</button>`);setTimeout(()=>{const n=$('#nl_name');if(n)n.focus()},50)}
+function saveLead(){const v=s=>(($(s)||{}).value||'').trim();const name=v('#nl_name'),phone=v('#nl_phone');if(!name||!phone){toast('Add a name and phone');return}
+  const ph=d10(phone);if(ph&&[...toCall(),...CL()].some(c=>d10(c.phone)===ph)){toast(name+' is already on your list');return}
+  const type=v('#nl_type'),size=v('#nl_size');const m={id:'f_'+uid(),name,phone,email:v('#nl_email'),address:v('#nl_address'),city:v('#nl_city'),type,size,building:[size,type.toLowerCase()].filter(Boolean).join(' '),source:v('#nl_src'),notes:v('#nl_notes'),created:Date.now()};
+  S.mine=S.mine||[];S.mine.push(m);S.out=S.out||[];S.out.push({k:'lead',...m});persist();closeSheet();render();toast(name+' added to your call list')}
+function outText(items){const fmt=ms=>new Date(ms).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+  const L=['TIMBERLINE FIELD UPDATE','Sent by: '+(S.name||'Salesman'),'Updates: '+items.length,''];
+  items.forEach(x=>{if(x.k==='lead'){L.push('NEW LEAD','Field ref: '+x.id,'Client name: '+x.name,'Phone: '+x.phone);[['Email',x.email],['Job address',x.address],['City',x.city],['Building type',x.type],['Size',x.size],['Source',x.source],['Notes',x.notes],['Added',fmt(x.created)]].forEach(([a,b])=>{if(b)L.push(a+': '+String(b).replace(/\n+/g,' / '))})}
+    else{L.push('CALL RESULT');if(x.ref)L.push('Lead ref: '+x.ref);if(x.fref)L.push('Field ref: '+x.fref);L.push('Client name: '+x.name,'Phone: '+x.phone,'Result: '+(RL[x.r]||x.r),'When: '+fmt(x.at));if(x.date)L.push('Appointment: '+x.date+(x.time?' '+x.time:''));if(x.next)L.push('Call back: '+x.next);if(x.note)L.push('Notes: '+x.note.replace(/\n+/g,' / '))}
+    L.push('')});return L.join('\n')}
+function sendOut(){const items=(S.out||[]).slice(0,25);if(!items.length)return;const n=items.length;const calls=items.filter(x=>x.k==='call').length,leads=n-calls;
+  const sub='Field update: '+[leads?leads+' new lead'+(leads>1?'s':''):'',calls?calls+' call'+(calls>1?'s':''):''].filter(Boolean).join(', ');const txt=outText(items);
+  const mail=`mailto:${OFFICE}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(txt)}`;const gweb=`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(OFFICE)}&su=${encodeURIComponent(sub)}&body=${encodeURIComponent(txt)}`;const gapp=`googlegmail://co?to=${encodeURIComponent(OFFICE)}&subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(txt)}`;
+  const ua=navigator.userAgent||'';const ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);const android=/Android/.test(ua);
+  const opts=ios?[['Open in Gmail',gapp],['Use the Mail app',mail]]:android?[['Open email',mail],['Gmail in the browser',gweb]]:[['Open Gmail',gweb],['Use my email program',mail]];
+  sendOut.ctx={ids:items,txt};
+  openSheet(`<h3>Send to the office</h3><p>${esc(sub.replace('Field update: ',''))}. The email is filled in. Tap Send in it, then come back and tap Done.</p>
+   <a class="btn pri" href="${esc(opts[0][1])}" target="_blank" rel="noopener" style="width:100%;height:52px">${opts[0][0]}</a><a class="btn" href="${esc(opts[1][1])}" target="_blank" rel="noopener" style="width:100%;height:44px">${opts[1][0]}</a>
+   <button class="big" type="button" data-outdone style="margin-top:4px">Done, it’s sent</button><button class="btn" type="button" data-outcopy>Copy the details instead</button><button class="btn ghost" type="button" data-close>Later</button>`)}
+function outDone(){const sent=sendOut.ctx.ids;S.out=(S.out||[]).filter(x=>!sent.includes(x));persist();closeSheet();render();toast((S.out||[]).length?'Sent. '+S.out.length+' more to send':'Sent to the office')}
 function upcoming(){const L=(S.sched&&S.sched.appts)||[];const td=isoD(new Date());return L.filter(a=>a.date>=td).sort((a,b)=>(a.date+(a.t24||'99')).localeCompare(b.date+(b.t24||'99')))}
 function gcal(a,place){if(!a.date)return '';const d=a.date.replace(/-/g,'');let dates;if(/^\d{4}$/.test(a.t24||'')){const h=+a.t24.slice(0,2),mi=a.t24.slice(2);const e=String(Math.min(h+1,23)).padStart(2,'0');dates=d+'T'+a.t24+'00/'+d+'T'+e+mi+'00'}else{const n=new Date(a.date+'T12:00:00');n.setDate(n.getDate()+1);dates=d+'/'+isoD(n).replace(/-/g,'')}
   return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Timberline: '+(a.name||'Client')+(a.building||a.type?' · '+cap(a.building||a.type):''))+'&dates='+dates+'&ctz=America/Boise'+(place?'&location='+encodeURIComponent(place+', Idaho'):'')+'&details='+encodeURIComponent([a.phone?'Phone: '+a.phone:'',a.notes||''].filter(Boolean).join('\n'))}
@@ -518,6 +585,14 @@ document.addEventListener('click',async e=>{
   if(t.hasAttribute('data-savecode')){const cd=(($('#sccode')||{}).value||'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');if(!cd){toast('Enter the code from the office');return}S.code=cd;S.sched=null;persist();render();loadSched();return}
   if(t.dataset.resend!=null){const x=S.sent[+t.dataset.resend];if(x&&x.d)send(x.d);return}
   if(t.hasAttribute('data-deldraft')){if(t.dataset.arm!=='1'){t.dataset.arm='1';t.textContent='Tap again to delete';return}const d=draft();(d.photos||[]).forEach(id=>fdel('ph_'+id));delete S.drafts[d.id];S.cur=null;persist();setTab('home');toast('Draft deleted');return}
+  if(t.dataset.logc){logSheet(t.dataset.logc);return}
+  if(t.dataset.res){logSheet.ctx.r=t.dataset.res;document.querySelectorAll('[data-res]').forEach(b=>b.setAttribute('aria-pressed',String(b===t)));logExtra(t.dataset.res);return}
+  if(t.hasAttribute('data-savelog')){saveLog();return}
+  if(t.hasAttribute('data-addlead')){leadSheet();return}
+  if(t.hasAttribute('data-savelead')){saveLead();return}
+  if(t.hasAttribute('data-sendout')){sendOut();return}
+  if(t.hasAttribute('data-outdone')){outDone();return}
+  if(t.hasAttribute('data-outcopy')){try{await navigator.clipboard.writeText(sendOut.ctx.txt);t.textContent='Copied. Paste it in an email to the office'}catch(err){t.textContent='Copy is blocked on this phone'}return}
   if(t.hasAttribute('data-close')){closeSheet();return}
   if(t.hasAttribute('data-copy')){try{await navigator.clipboard.writeText(OFFICE);t.textContent='Copied'}catch(err){const i=t.previousElementSibling;i.select()}return}
   if(t.hasAttribute('data-copytext')){try{await navigator.clipboard.writeText(send.ctx.txt);t.textContent='Copied. Paste it in a text or email'}catch(err){t.textContent='Copy is blocked on this phone'}return}
@@ -535,7 +610,7 @@ document.addEventListener('change',e=>{const el=e.target;if(el.id==='ph'){const 
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet')closeSheet()});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='nm'){e.preventDefault();$('[data-savename]').click()}});
 
-const BUILD='1793219044';
+const BUILD='1794081572';
 async function checkVer(){if(!/github\.io$/.test(location.hostname)||BUILD.indexOf('__')===0)return;try{const r=await fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)return;const m=(await r.text()).match(/const BUILD='(\d+)'/);if(m&&m[1]!==BUILD&&!(tab==='intake'&&draft())){persist();location.reload()}}catch(e){}}
 setTimeout(checkVer,1500);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState!=='visible')return;checkVer();if(S.code&&Date.now()-(S.schedAt||0)>5*60000)loadSched()});
