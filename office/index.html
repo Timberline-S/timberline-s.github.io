@@ -87,7 +87,8 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const b64d=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0));
 async function fileId(code){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('tl-field:'+code));return [...new Uint8Array(h)].slice(0,10).map(b=>b.toString(16).padStart(2,'0')).join('')}
 async function unseal(j,code){const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(code),'PBKDF2',false,['deriveKey']);const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64d(j.salt),iterations:j.it||150000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(j.iv)},key,b64d(j.ct))))}
-async function load(code){const r=await fetch('../sched/'+(await fileId(code))+'.json?t='+Date.now(),{cache:'no-store'});if(r.status===404)throw new Error('nocode');if(!r.ok)throw new Error('net');const j=await r.json();const d=await unseal(j,code);if(!d||d.v!==1||!d.leads)throw new Error('nocode');return d}
+async function loadLive(code){try{const r=await fetch('https://brtbriekpvmdzjwtshgv.supabase.co/rest/v1/rpc/owner_snapshot',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json',apikey:'sb_publishable_ZW9Ez6srtY1QzPPM3lBg2g_-wIcmNu-'},body:JSON.stringify({p_code:code})});if(!r.ok)return null;const d=await r.json();return d&&d.v===1&&d.leads?d:null}catch(e){return null}}
+async function load(code){const live=await loadLive(code);if(live)return live;const r=await fetch('../sched/'+(await fileId(code))+'.json?t='+Date.now(),{cache:'no-store'});if(r.status===404)throw new Error('nocode');if(!r.ok)throw new Error('net');const j=await r.json();const d=await unseal(j,code);if(!d||d.v!==1||!d.leads)throw new Error('nocode');return d}
 
 /* helpers */
 const n=x=>{const v=+String(x??'').replace(/[^0-9.\-]/g,'');return isFinite(v)?v:0};
@@ -104,9 +105,9 @@ const cap=s=>s?s[0].toUpperCase()+s.slice(1):s;
 const repName=id=>id?((S.snap.team||{})[id]||'Salesman'):'Unassigned';
 const COLORS=['#2F6B1F','#1F5A8A','#995A00','#7A3E9D','#0E7C7B','#B42318'];
 const repColor=id=>{if(!id)return '#9AA397';const ids=Object.keys(S.snap.team||{}).sort();const i=ids.indexOf(id);return COLORS[(i<0?0:i)%COLORS.length]};
-function stage(l){if(l.lostAt)return 'Lost';if(l.signedAt||l.jobId)return 'Signed';if(l.acceptedAt)return 'Accepted';if(l.quoteSentAt)return 'Quote sent';if(l.intakeAt)return 'Quoting';if(l.apptDate)return 'Appointment set';if(l.assignedTo||l._rep)return 'Assigned';return 'New'}
-const STG=['New','Assigned','Appointment set','Quoting','Quote sent','Accepted','Signed','Lost'];
-const STGL={'New':'New','Assigned':'Assigned','Appointment set':'Appointment set','Quoting':'Office pricing','Quote sent':'Proposal out','Accepted':'Accepted','Signed':'Signed','Lost':'Lost'};
+function stage(l){if(l.lostAt)return 'Lost';if(l.signedAt||l.jobId)return 'Signed';if(l.acceptedAt)return 'Accepted';if(l.quoteSentAt)return 'Quote sent';if(l.qr&&l.qr.status==='approved')return 'Quote ready';if(l.qr&&(l.qr.status==='review'||l.qr.status==='changes'))return 'Quoting';if(l.intakeAt)return 'Quoting';if(l.apptDate)return 'Appointment set';if(l.assignedTo||l._rep)return 'Assigned';return 'New'}
+const STG=['New','Assigned','Appointment set','Quoting','Quote ready','Quote sent','Accepted','Signed','Lost'];
+const STGL={'New':'New','Assigned':'Assigned','Appointment set':'Appointment set','Quoting':'Office pricing','Quote ready':'Quote ready to send','Quote sent':'Proposal out','Accepted':'Accepted','Signed':'Signed','Lost':'Lost'};
 const bld=l=>[l.size,cap(String(l.type||'').toLowerCase())].filter(Boolean).join(' ');
 const ACTIVE=['Signed','In progress'],BOOKED=['Signed','In progress','Complete'];
 const CHECK=['estimate','contract','deposit','engineering','permitSub','permitIss','materials','subs','cos','finalInsp','finalInv','lien','warranty'];
@@ -189,7 +190,8 @@ document.addEventListener('click',async e=>{const t=e.target.closest('button');i
  if(t.id==='open'){const c=$('#code').value.trim().toLowerCase().replace(/[^a-z0-9]/g,'');if(!c){$('#err').textContent='Enter your office code';return}t.textContent='Opening';$('#err').textContent='';
   try{const d=await load(c);S.code=c;S.snap=d;S.at=Date.now();save();showApp()}catch(err){$('#err').textContent=err.message==='nocode'?'That code did not open anything. Check it with the office.':'No signal right now. Try again in a moment.'}t.textContent='Open'}});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='code')$('#open').click()});
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&Date.now()-S.at>5*60000)refresh(true)});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&Date.now()-S.at>60000)refresh(true)});
+setInterval(()=>{if(S.code&&document.visibilityState==='visible')refresh(true)},60000);
 if(S.code&&S.snap){showApp();refresh(true)}else showLock();
 })();
 </script></body></html>
