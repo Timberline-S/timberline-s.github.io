@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#F4F5F1">
+<title>Timberline Builders Site Intake</title>
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="icon" href="../icon-192.png">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F4F5F1;color:#1F2125;font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
+header{background:#fff;border-bottom:3px solid #3A6129;padding:16px 18px}
+header b{display:block;color:#3A6129;font-size:22px;letter-spacing:.5px}
+header span{color:#555;font-size:15px}
+main{max-width:720px;margin:0 auto;padding:14px 14px 140px}
+.intro{color:#555;font-size:15px;margin:4px 2px 14px}
+.card{background:#fff;border:1px solid #DDE0D8;border-radius:12px;margin:0 0 14px;padding:4px 16px 14px}
+.card h2{color:#3A6129;font-size:17px;text-transform:uppercase;letter-spacing:.4px;margin:12px 0 6px;border-bottom:1px solid #3A6129;padding-bottom:6px}
+.f{margin:12px 0 0}
+.f>label,.q{display:block;font-weight:600;font-size:15px;margin-bottom:6px}
+.f>label i,.q i{color:#B03A2E;font-style:normal}
+.hint{font-weight:400;color:#777;font-size:13px}
+input[type=text],input[type=tel],input[type=email],input[type=date],textarea{width:100%;font:inherit;font-size:16px;padding:11px 12px;border:1px solid #C9CDC4;border-radius:9px;background:#fff;color:#1F2125}
+textarea{min-height:92px;resize:vertical}
+input:focus,textarea:focus{outline:2px solid #618A36;border-color:#618A36}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.row .f,.row3 .f{margin-top:12px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts label{display:inline-flex;align-items:center;gap:7px;border:1px solid #C9CDC4;border-radius:999px;padding:8px 13px;font-size:15px;cursor:pointer;background:#fff;user-select:none}
+.opts input{position:absolute;opacity:0;pointer-events:none}
+.opts label.on{border-color:#3A6129;background:#EEF4EA;color:#2B4A1E;font-weight:600}
+.chk{display:flex;gap:10px;align-items:center;margin:12px 0 0;font-size:15.5px}
+.chk input{width:22px;height:22px;accent-color:#3A6129}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #DDE0D8;padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
+.bar .in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:10px}
+button{font:inherit;font-weight:700;border-radius:10px;padding:13px 16px;border:1px solid #3A6129;cursor:pointer}
+.pri{background:#3A6129;color:#fff}.sec{background:#fff;color:#3A6129}
+.saved{grid-column:1/-1;font-size:12.5px;color:#777;text-align:center}
+.msg{display:none;position:fixed;left:50%;top:18px;transform:translateX(-50%);background:#1F2125;color:#fff;padding:11px 16px;border-radius:10px;font-size:14.5px;z-index:9;max-width:92vw}
+.done{display:none;background:#fff;border:1px solid #3A6129;border-radius:12px;padding:14px 16px;margin:0 0 14px}
+.done b{color:#3A6129}
+.done .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+@media(max-width:480px){.row3{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header><b>TIMBERLINE BUILDERS</b><span>Site Intake Questions</span></header>
+<main>
+<p class="intro">Fill in everything you can at the appointment. Your answers save on this phone as you go. When you're done, tap <b>Download PDF</b>, then email the PDF and your site photos to <b>timberlinebuilders.info@gmail.com</b>.</p>
+<div class="done" id="done"><b>Your PDF is ready.</b><div id="donetxt" style="font-size:14.5px;margin-top:4px"></div><div class="btns"><button class="pri" type="button" id="share" hidden>Send or save it</button><button class="sec" type="button" id="again">Download again</button></div></div>
+<form id="form" autocomplete="off"></form>
+</main>
+<div class="bar"><div class="in"><button class="pri" type="button" id="dl">Download PDF</button><button class="sec" type="button" id="clear">Start new</button><div class="saved" id="saved">Saved on this phone</div></div></div>
+<div class="msg" id="msg"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script>
+(function(){
+/* field names match the fillable PDF template exactly */
+var S=[
+ {h:null,f:[
+  {row:[{n:'Salesman',l:'Salesman',v:'David'},{n:'Date',l:'Date',t:'date'}]},
+  {n:'Start_from_a_scope_package_optional',l:'Start from a scope package',hint:'optional',o:['30x40 shop','40x60 shop with lean to','RV and boat storage','24x30 garage','40x60 barndo shell','36x48 horse barn','30x60 equipment shed']}
+ ]},
+ {h:'Client',f:[
+  {n:'Client_name',l:'Client name',r:1},
+  {row:[{n:'Phone',l:'Phone',r:1,t:'tel'},{n:'Email',l:'Email',t:'email'}]},
+  {n:'Best_time_to_reach_them',l:'Best time to reach them'},
+  {n:'Job_address',l:'Job address',r:1},
+  {n:'City',l:'City',r:1},
+  {n:'Mailing_address',l:'Mailing address',hint:'if different'},
+  {n:'Who_else_makes_the_decision',l:'Who else makes the decision'}
+ ]},
+ {h:'Building',f:[
+  {n:'Building_type',l:'Building type',r:1,o:['Post frame shop','Pole barn','Garage','Barndominium','Custom home','ADU','Addition','Stick frame shop','Metal building','Other']},
+  {n:'What_it_will_be_used_for',l:'What it will be used for',o:['Shop or garage','Equipment storage','RV or boat storage','Living space','Horses or livestock','Commercial','Other']},
+  {row3:[{n:'Width_ft',l:'Width (ft)',r:1,num:1},{n:'Length_ft',l:'Length (ft)',r:1,num:1},{n:'Eave_ft',l:'Eave (ft)',r:1,num:1}]},
+  {n:'Roof_pitch',l:'Roof pitch',o:['3/12','4/12','5/12','6/12','Other','Not sure']},
+  {n:'Overhangs',l:'Overhangs',o:['None','12 in','18 in','24 in','Other']},
+  {n:'Loft_or_mezzanine',l:'Loft or mezzanine',o:['Yes','No','Not sure']},
+  {n:'Loft_size_sf',l:'Loft size (sf)',num:1},
+  {row:[{n:'Lean_to_1_depth_ft',l:'Lean to 1 depth (ft)',num:1},{n:'Lean_to_1_length_ft',l:'Lean to 1 length (ft)',num:1,hint:'blank = full length'}]},
+  {row:[{n:'Lean_to_1_type',l:'Lean to 1',o:['Open','Enclosed']},{n:'Side',l:'Lean to 1 side',ph:'East side'}]},
+  {row:[{n:'Lean_to_2_depth_ft',l:'Lean to 2 depth (ft)',num:1},{n:'Lean_to_2_length_ft',l:'Lean to 2 length (ft)',num:1}]},
+  {row:[{n:'Lean_to_2_type',l:'Lean to 2',o:['Open','Enclosed']},{n:'Side_2',l:'Lean to 2 side'}]}
+ ]},
+ {h:'Doors and windows',f:[
+  {n:'Overhead_doors',l:'Overhead doors',ph:'2 at 12x14, 1 at 10x10'},
+  {n:'Walk_doors',l:'Walk doors',ph:'How many'},
+  {n:'Windows',l:'Windows',ph:'4 at 3x3'},
+  {n:'Other_openings',l:'Other openings',ph:'Sliding door, open bays'}
+ ]},
+ {h:'Inside and finish',f:[
+  {n:'Concrete_slab',l:'Concrete slab',o:['Yes, by us','Yes, by others','No slab','Not sure']},
+  {n:'Slab_details',l:'Slab details',ph:'4 in, floor drain, radiant'},
+  {n:'Insulation',l:'Insulation',o:['None','Roof only','Roof and walls','Spray foam','Not sure']},
+  {n:'Interior_liner',l:'Interior liner',o:['None','Liner panel','Plywood or OSB','Drywall','Not sure']},
+  {n:'Wainscot',l:'Wainscot',o:['None','Metal','Stone','Other']},
+  {n:'Electrical',l:'Electrical',o:['By us','By owner','Not needed','Not sure']},
+  {n:'Plumbing',l:'Plumbing',o:['By us','By owner','Not needed','Not sure']},
+  {row3:[{n:'Roof_color',l:'Roof color'},{n:'Wall_color',l:'Wall color'},{n:'Trim_color',l:'Trim color'}]}
+ ]},
+ {h:'Site and permit',f:[
+  {n:'Site_condition',l:'Site condition',o:['Level and ready','Needs excavation','Needs fill','Not sure']},
+  {n:'Truck_access',l:'Truck access',o:['Good','Tight','Poor','Not sure']},
+  {n:'Power_at_the_site',l:'Power at the site',o:['Yes','No','Not sure']},
+  {n:'HOA_or_covenants',l:'HOA or covenants',o:['Yes','No','Not sure']},
+  {n:'County_or_city_for_the_permit',l:'County or city for the permit'},
+  {n:'Miles_from_Boise',l:'Miles from Boise',num:1},
+  {n:'Setbacks_easements_septic_or_well_near_the_build',l:'Setbacks, easements, septic or well near the build',area:1}
+ ]},
+ {h:'Budget and timing',f:[
+  {n:'Budget_range',l:'Budget range',ph:'$60k to $75k'},
+  {n:'When_they_want_to_start',l:'When they want to start'},
+  {n:'Other_bids',l:'Other bids',ph:'Who, and price if they shared it'},
+  {n:'Paying_with',l:'Paying with',o:['Cash','Financing','Not sure']}
+ ]},
+ {h:'Notes',f:[
+  {n:'Anything_else_for_the_quote',l:'Anything else for the quote',area:1},
+  {n:'How_likely_to_buy',l:'How likely to buy',o:['Hot','Warm','Cold']},
+  {n:'Your_read_on_the_client',l:'Your read on the client',area:1,ph:'How serious, concerns, what will close it'},
+  {n:'Measured_the_site',l:'Measured the site',cb:1},
+  {n:'Took_site_photos_all_four_sides_access_where_the_building_goes',l:'Took site photos (all four sides, access, where the building goes)',cb:1}
+ ]}
+];
+var KEY='tl-intake-pdf-v1',ALL=[];
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function ev(o){return o.replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,'')}
+function field(f){
+ ALL.push(f);
+ var lab=esc(f.l)+(f.r?' <i>*</i>':'')+(f.hint?' <span class="hint">'+esc(f.hint)+'</span>':'');
+ if(f.cb)return '<label class="chk"><input type="checkbox" name="'+f.n+'">'+esc(f.l)+'</label>';
+ if(f.o)return '<div class="f"><span class="q">'+lab+'</span><div class="opts">'+f.o.map(function(o){return '<label><input type="radio" name="'+f.n+'" value="'+ev(o)+'">'+esc(o)+'</label>'}).join('')+'</div></div>';
+ if(f.area)return '<div class="f"><label for="x_'+f.n+'">'+lab+'</label><textarea id="x_'+f.n+'" name="'+f.n+'" placeholder="'+esc(f.ph||'')+'"></textarea></div>';
+ var ty=f.t||'text';
+ return '<div class="f"><label for="x_'+f.n+'">'+lab+'</label><input id="x_'+f.n+'" name="'+f.n+'" type="'+ty+'"'+(f.num?' inputmode="decimal"':'')+(f.t==='tel'?' autocomplete="tel"':'')+' placeholder="'+esc(f.ph||'')+'"></div>';
+}
+var h='';
+S.forEach(function(s){
+ h+='<div class="card">'+(s.h?'<h2>'+esc(s.h)+'</h2>':'');
+ s.f.forEach(function(f){
+  if(f.row)h+='<div class="row">'+f.row.map(field).join('')+'</div>';
+  else if(f.row3)h+='<div class="row3">'+f.row3.map(field).join('')+'</div>';
+  else h+=field(f);
+ });
+ h+='</div>';
+});
+var form=document.getElementById('form');form.innerHTML=h;
+function $(s){return document.querySelector(s)}
+function msg(t){var m=$('#msg');m.textContent=t;m.style.display='block';clearTimeout(msg.t);msg.t=setTimeout(function(){m.style.display='none'},3200)}
+function read(){var d={};ALL.forEach(function(f){var els=form.elements[f.n];if(f.cb)d[f.n]=els.checked;else if(f.o){var c=form.querySelector('input[name="'+f.n+'"]:checked');d[f.n]=c?c.value:''}else d[f.n]=els.value});return d}
+function paint(){form.querySelectorAll('.opts label').forEach(function(l){l.classList.toggle('on',l.querySelector('input').checked)})}
+function write(d){ALL.forEach(function(f){var v=d[f.n];if(f.cb)form.elements[f.n].checked=!!v;else if(f.o){form.querySelectorAll('input[name="'+f.n+'"]').forEach(function(r){r.checked=(r.value===v)})}else form.elements[f.n].value=v==null?'':v});paint()}
+function defaults(){var d={Salesman:'David'};var t=new Date();d.Date=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');return d}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(read()));$('#saved').textContent='Saved on this phone '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}catch(e){$('#saved').textContent='This browser is not saving. Download before closing.'}}
+var start=defaults();try{var j=JSON.parse(localStorage.getItem(KEY)||'null');if(j)start=j}catch(e){}
+write(start);
+form.addEventListener('input',function(){paint();save()});form.addEventListener('change',function(){paint();save()});
+form.addEventListener('submit',function(e){e.preventDefault()});
+form.addEventListener('click',function(e){var l=e.target.closest('.opts label');if(!l)return;var r=l.querySelector('input');if(r.checked&&e.target===l&&l.dataset.was==='1'){}});
+$('#clear').addEventListener('click',function(){if(!$('#clear').dataset.sure){$('#clear').dataset.sure='1';$('#clear').textContent='Tap again to clear';setTimeout(function(){delete $('#clear').dataset.sure;$('#clear').textContent='Start new'},3000);return}
+ delete $('#clear').dataset.sure;$('#clear').textContent='Start new';var keep=read().Salesman;var d=defaults();d.Salesman=keep||'David';write(d);save();$('#done').style.display='none';window.scrollTo(0,0);msg('Cleared. Ready for the next client.')});
+function fileName(d){var n=(d.Client_name||'Client').replace(/[^A-Za-z0-9 ]+/g,'').trim().replace(/\s+/g,' ')||'Client';return 'Timberline Intake '+n+(d.Date?' '+d.Date:'')+'.pdf'}
+function niceDate(v){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v||'');return m?(+m[2])+'/'+(+m[3])+'/'+m[1]:v}
+var last=null;
+async function build(){
+ var d=read();
+ var miss=[];ALL.forEach(function(f){if(f.r&&!d[f.n])miss.push(f.l)});
+ var bytes=await fetch('intake-template.pdf',{cache:'no-cache'}).then(function(r){if(!r.ok)throw new Error('template');return r.arrayBuffer()});
+ var doc=await PDFLib.PDFDocument.load(bytes);var fm=doc.getForm();
+ var font=await doc.embedFont(PDFLib.StandardFonts.Helvetica);
+ var pages=doc.getPages(),ink=PDFLib.rgb(0.12,0.13,0.15),G=PDFLib.rgb(0.23,0.38,0.16);
+ function pageOf(w){var r=w.P();for(var i=0;i<pages.length;i++)if(pages[i].ref===r)return pages[i];return pages[0]}
+ function fit(t,size,w){while(size>8&&font.widthOfTextAtSize(t,size)>w)size-=0.5;return size}
+ function wrap(t,size,w){var out=[];String(t).split(/\n/).forEach(function(par){var line='';par.split(/\s+/).forEach(function(word){var tryl=line?line+' '+word:word;if(font.widthOfTextAtSize(tryl,size)<=w)line=tryl;else{if(line)out.push(line);line=word}});out.push(line)});return out}
+ function tick(p,r,on){p.drawRectangle({x:r.x+0.5,y:r.y+0.5,width:r.width-1,height:r.height-1,borderColor:ink,borderWidth:0.9});if(on){p.drawLine({start:{x:r.x+2.2,y:r.y+r.height*0.52},end:{x:r.x+r.width*0.42,y:r.y+2.2},thickness:1.8,color:G});p.drawLine({start:{x:r.x+r.width*0.42,y:r.y+2.2},end:{x:r.x+r.width+2,y:r.y+r.height+2},thickness:1.8,color:G})}}
+ ALL.forEach(function(f){var v=d[f.n];try{
+  var fld=fm.getField(f.n),ws=fld.acroField.getWidgets();
+  ws.forEach(function(w){var p=pageOf(w),r=w.getRectangle();
+   if(f.cb)tick(p,r,!!v);
+   else if(f.o){var on=w.getOnValue();var nm=on?on.decodeText():'';tick(p,r,!!v&&nm===v)}
+   else{var t=f.n==='Date'?niceDate(v):(v||'');if(!t)return;
+    if(f.area){var size=11,lines=wrap(t,size,r.width-6),gap=24;var avail=Math.floor((r.height+6)/gap);
+     if(lines.length>avail){size=9.5;lines=wrap(t,size,r.width-6);gap=Math.max(11,(r.height+4)/lines.length)}
+     lines.forEach(function(L,i){var y=r.y+r.height+2-gap*(i+1)+4;if(gap<24)y=r.y+r.height-size-i*gap;if(y>r.y-6)p.drawText(L,{x:r.x+3,y:y,size:size,font:font,color:ink})})}
+    else{var sz=fit(t,12,r.width-4);p.drawText(t,{x:r.x+2,y:r.y+3,size:sz,font:font,color:ink})}}
+  });
+ }catch(e){console.warn(f.n,e)}});
+ pages.forEach(function(p){p.node.delete(PDFLib.PDFName.of('Annots'))});doc.catalog.delete(PDFLib.PDFName.of('AcroForm'));
+ doc.setTitle('Timberline Intake '+(d.Client_name||''));doc.setAuthor('Timberline Builders');doc.setCreator('Timberline Builders');doc.setProducer('Timberline Builders');
+ var out=await doc.save();
+ return {blob:new Blob([out],{type:'application/pdf'}),name:fileName(d),miss:miss};
+}
+function download(p){var u=URL.createObjectURL(p.blob);var a=document.createElement('a');a.href=u;a.download=p.name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},60000)}
+$('#dl').addEventListener('click',async function(){
+ var b=$('#dl');b.disabled=true;b.textContent='Building PDF';
+ try{
+  last=await build();download(last);
+  var canShare=false;try{canShare=!!(navigator.canShare&&navigator.canShare({files:[new File([last.blob],last.name,{type:'application/pdf'})]}))}catch(e){}
+  $('#share').hidden=!canShare;
+  $('#donetxt').innerHTML='Saved as <b>'+esc(last.name)+'</b>.'+(last.miss.length?'<br><span style="color:#B03A2E">Still blank: '+esc(last.miss.join(', '))+'</span>':'')+(canShare?'<br>Tap Send or save it to email it to the office or save it to Files.':'<br>Find it in your Downloads, then email it with your site photos.');
+  $('#done').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
+ }catch(e){msg('Could not build the PDF. Check your signal and try again.')}
+ b.disabled=false;b.textContent='Download PDF';
+});
+$('#again').addEventListener('click',function(){if(last)download(last)});
+$('#share').addEventListener('click',async function(){if(!last)return;try{await navigator.share({files:[new File([last.blob],last.name,{type:'application/pdf'})],title:last.name,text:'Site intake for the office'})}catch(e){if(!(e&&e.name==='AbortError'))msg('Sharing did not work here. Use Download again.')}});
+})();
+</script>
+</body>
+</html>
